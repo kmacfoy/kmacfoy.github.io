@@ -26,9 +26,14 @@ jobs:
       with:
         inlineScript: |
          az account set --subscription "1f9e870a-8f55-4a59-9977-55f5a592c78b"
-          az storage blob upload-batch \
-            --auth-mode login \
+         for file in $(find . -type f) ; do
+           rel_path="${file#./}"
+         az storage blob upload \
+            --auth-mode login
             --account-name kmreshtml \
-            --destination '$web' \
-            --source "." \
+            --container-name '$web' \
+            --file "$file"
+            --name "$rel_path"  \
+            --content-cache-control "no-cache"  \
             --overwrite
+          done
