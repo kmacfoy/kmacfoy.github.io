@@ -28,7 +28,7 @@ jobs:
          az account set --subscription "1f9e870a-8f55-4a59-9977-55f5a592c78b"
           az storage blob upload-batch \
             --auth-mode login
-            --destination $web \
-            --source . \
             --account-name kmreshtml \
+            --destination '$web' \
+            --source "." \
             --overwrite
