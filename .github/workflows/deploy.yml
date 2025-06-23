@@ -26,6 +26,7 @@ jobs:
       with:
         inlineScript: |
           az storage blob upload-batch \
+            --auth-mode login
             --destination \$web \
             --source . \
             --account-name kmreshtml \
