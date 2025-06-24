@@ -9,3 +9,5 @@ I have uploaded both my index.html and style.css files
 Added a link to my GitHub repository
 
 Created CI/CD by linking GitHub with Azure
+
+6/23/25 - removed checkmarks from certification section and fixed cdn purging
