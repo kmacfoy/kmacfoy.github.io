@@ -81,18 +81,22 @@
     </ul>
   </section>
 
-  <section class="projects">
-    <h2>Projects</h2>
-    <ul>
-      <li>
-        <strong>Cloud Resume Challenge</strong> – <br/>
-        Serverless website hosted on Azure Static Web Apps with GitHub CI/CD, Azure Functions, and Cosmos DB
-      </li>
-     </ul>
+  <section class="visitor">
+    <h2>👀 Visitor Count: <span id="counter">Loading...</span></h2>
   </section>
 
-  <body>
-  <h1>👀 Visitor Count: <span id="counter">Loading...</span></h1>
+  <section class="contact">
+    <h2>Contact</h2>
+    <p>Email: <a href="mailto:o.macfoy@gmail.com">HERE</a></p>
+    <p>LinkedIn: <a href="https://linkedin.com/in/kaymacfoy" target="_blank">Kay Olumide Macfoy</a></p>
+  </section>
+
+  <footer>
+    <p>© 2025 Kay Macfoy</p>
+    <p>View source on 
+    <a href="https://github.com/kmacfoy/kmacfoy.github.io" target ="_blank">GitHub</a>
+    </p>
+  </footer>
 
   <script>
     fetch('https://kmrescounterapi.azurewebsites.net/api/countvisitor')
@@ -108,20 +112,5 @@
         document.getElementById('counter').textContent = 'Error';
       });
   </script>
-</body>
-</html>
-
-  <section class="contact">
-    <h2>Contact</h2>
-    <p>Email: <a href="mailto:o.macfoy@gmail.com">HERE</a></p>
-    <p>LinkedIn: <a href="https://linkedin.com/in/kaymacfoy" target="_blank">Kay Olumide Macfoy</a></p>
-  </section>
-
-  <footer>
-    <p>© 2025 Kay Macfoy</p>
-    <p>View source on 
-    <a href="https://github.com/kmacfoy/kmacfoy.github.io" target ="_blank">GitHub<a/>
-    </p>
-  </footer>
 </body>
 </html>
