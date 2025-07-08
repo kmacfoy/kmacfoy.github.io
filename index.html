@@ -91,6 +91,26 @@
      </ul>
   </section>
 
+  <body>
+  <h1>👀 Visitor Count: <span id="counter">Loading...</span></h1>
+
+  <script>
+    fetch('https://kmrescounterapi.azurewebsites.net/api/countvisitor')
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      })
+      .then(data => {
+        document.getElementById('counter').textContent = data.count;
+      })
+      .catch(err => {
+        console.error('Fetch failed:', err);
+        document.getElementById('counter').textContent = 'Error';
+      });
+  </script>
+</body>
+</html>
+
   <section class="contact">
     <h2>Contact</h2>
     <p>Email: <a href="mailto:o.macfoy@gmail.com">HERE</a></p>
