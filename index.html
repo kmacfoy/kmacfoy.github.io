@@ -100,17 +100,24 @@
 
   <script>
     fetch('https://kmrescounterapi.azurewebsites.net/api/countvisitor')
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        return res.json();
-      })
-      .then(data => {
-        document.getElementById('counter').textContent = data.count;
-      })
-      .catch(err => {
-        console.error('Fetch failed:', err);
-        document.getElementById('counter').textContent = 'Error';
-      });
+  .then(res => {
+    console.log("Status:", res.status);
+    return res.text(); // get raw response body first
+  })
+  .then(text => {
+    console.log("Raw response:", text);
+    try {
+      const data = JSON.parse(text);
+      document.getElementById('counter').textContent = data.count;
+    } catch (parseErr) {
+      console.error("❌ JSON parse failed:", parseErr);
+      document.getElementById('counter').textContent = 'Parse Error';
+    }
+  })
+  .catch(err => {
+    console.error('Fetch failed:', err);
+    document.getElementById('counter').textContent = 'Network Error';
+  });
   </script>
 </body>
 </html>
