@@ -99,25 +99,25 @@
   </footer>
 
   <script>
-    fetch('https://kmrescounterapi.azurewebsites.net/api/countvisitor')
+    fetch("https://kmrescounterapi.azurewebsites.net/api/countvisitor")
   .then(res => {
-    console.log("Status:", res.status);
-    return res.text(); // get raw response body first
+    if (!res.ok) throw new Error("Network response was not OK");
+    return res.text();  // Parse as text first
   })
   .then(text => {
-    console.log("Raw response:", text);
-    try {
-      const data = JSON.parse(text);
-      document.getElementById('counter').textContent = data.count;
-    } catch (parseErr) {
-      console.error("❌ JSON parse failed:", parseErr);
-      document.getElementById('counter').textContent = 'Parse Error';
-    }
+    if (!text) throw new Error("Empty response");
+    return JSON.parse(text);
+  })
+  .then(data => {
+    console.log("Visitor count:", data.count);
+    // Display count in UI
   })
   .catch(err => {
-    console.error('Fetch failed:', err);
-    document.getElementById('counter').textContent = 'Network Error';
+    console.error("Visitor counter failed:", err);
   });
+
+    document.getElementById('counter').textContent = 'Network Error';
+  
   </script>
 </body>
 </html>
