@@ -102,11 +102,7 @@
     fetch("https://kmrescounterapi.azurewebsites.net/api/countvisitor")
   .then(res => {
     if (!res.ok) throw new Error("Network response was not OK");
-    return res.text();  // Parse as text first
-  })
-  .then(text => {
-    if (!text) throw new Error("Empty response");
-    return JSON.parse(text);
+    return res.json(); // Automatically parses JSON
   })
   .then(data => {
     console.log("Visitor count:", data.count);
@@ -116,7 +112,7 @@
     console.error("Visitor counter failed:", err);
   });
 
-    document.getElementById('counter').textContent = 'Network Error';
+  document.getElementById('counter').textContent = 'Network Error';
   
   </script>
 </body>
