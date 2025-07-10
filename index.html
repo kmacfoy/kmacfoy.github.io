@@ -99,23 +99,13 @@
   </footer>
 
   <script>
-    fetch("https://kmrescounterapi.azurewebsites.net/api/countvisitor")
-  .then(res => {
-    if (!res.ok) throw new Error("Network response was not OK");
-    return res.json(); // Automatically parses JSON
+fetch('https://kmrescounterapi.azurewebsites.net/api/countvisitor')
+  .then(r => r.text())
+  .then(t => {
+    console.log('RAW-RESPONSE-BODY →', JSON.stringify(t));
   })
-  .then(data => {
-    console.log("Visitor count:", data.count);
-    document.getElementById('counter').textContent = data.count;
-    // Display count in UI
-  })
-  .catch(err => {
-    console.error("Visitor counter failed:", err);
-    document.getElementById('counter').textContent = 'Network Error';
-  });
+  .catch(e => console.error('fetch failed', e));
+</script>
 
-  
-  
-  </script>
 </body>
 </html>
