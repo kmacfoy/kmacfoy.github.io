@@ -106,13 +106,15 @@
   })
   .then(data => {
     console.log("Visitor count:", data.count);
+    document.getElementById('counter').textContent = data.count;
     // Display count in UI
   })
   .catch(err => {
     console.error("Visitor counter failed:", err);
+    document.getElementById('counter').textContent = 'Network Error';
   });
 
-  document.getElementById('counter').textContent = 'Network Error';
+  
   
   </script>
 </body>
