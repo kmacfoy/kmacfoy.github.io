@@ -1,4 +1,4 @@
-name: Deploy to Azure Static Website
+name: Deploy to Azure Static Website and Function App
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  deploy:
+  deploy-frontend:
     runs-on: ubuntu-latest
 
     steps:
@@ -37,7 +37,8 @@ jobs:
             --name "$rel_path" \
             --content-cache-control "no-cache" \
             --overwrite
-          done
+         done
+
     - name: Purge Azure CDN Cache
       uses: azure/cli@v1
       with:
@@ -48,3 +49,30 @@ jobs:
             --profile-name resumeCDN \
             --name kmendpoint \
             --content-paths '/*'
+  deploy-function:
+    needs: deploy-frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: countvisitor
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Zip function app contents
+        run: zip -r ../functionapp.zip . -x '*.git*'
+
+      - name: Deploy to Azure Function App
+        uses: azure/functions-action@v1
+        with:
+          app-name: kmrescounterapi
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+          package: functionapp.zip
