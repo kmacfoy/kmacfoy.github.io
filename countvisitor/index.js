@@ -4,7 +4,8 @@ module.exports = async function (context, req) {
   let CosmosClient;
 
   try {
-    ({ CosmosClient } = require("@azure/cosmos"));
+    const cosmosModule = require("@azure/cosmos");
+    CosmosClient = cosmosModule.CosmosClient;
   } catch (importErr) {
     context.log("❌ Failed to load @azure/cosmos:", importErr.message);
     context.res = {
