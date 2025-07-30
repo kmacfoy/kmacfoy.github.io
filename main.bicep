@@ -98,6 +98,9 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
           name: 'COSMOS_KEY'
           value: listKeys(cosmosDbAccount.id, '2023-03-15').primaryMasterKey
         }
+        {name: 'FUNCTIONS_WORKER_RUNTIME'
+         value: 'node'
+        }
       ]
     }
     httpsOnly: true
