@@ -101,6 +101,9 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
         {name: 'FUNCTIONS_WORKER_RUNTIME'
          value: 'node'
         }
+        {name: 'WEBSITE_RUN_FROM_PACKAGE'
+         value: '1'
+        }
       ]
     }
     httpsOnly: true
