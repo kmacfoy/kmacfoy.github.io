@@ -85,7 +85,7 @@ jobs:
         working-directory: countvisitor
 
       - name: Zip function app contents
-        run: zip -r functionapp.zip countvisitor -x '*.git*'
+        run: zip -r ../functionapp.zip countvisitor -x '*.git*'
         working-directory: countvisitor
 
       - name: Deploy to Azure Function App
