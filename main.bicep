@@ -84,14 +84,16 @@ resource hostingPlan 'Microsoft.Web/serverfarms@2023-01-01' = {
 resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   name: functionAppName
   location: location
-  kind: 'functionapp'
+  kind: 'functionapp,linux'
   properties: {
     serverFarmId: hostingPlan.id
+    reserved: true //required for Linux
     siteConfig: {
+      linuxFxVersion: 'Node|18'
       appSettings: [
         {
           name: 'AzureWebJobsStorage'
-          value: listKeys (storageAccount.id, '2023-01-01').keys[0].value
+          value: listKeys(storageAccount.id, '2023-01-01').keys[0].value
         }
         {
           name: 'COSMOS_ENDPOINT'
