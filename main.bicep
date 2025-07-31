@@ -19,14 +19,17 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   properties: {
     accessTier: 'Hot'
     allowBlobPublicAccess: true
-    staticWebsite: {
-      enabled: true
-      indexDocument: 'index.html'
-      error404Document: '404.html'
-    }
   }
 }
-
+// Static Website Configuration
+resource staticWebsite 'Microsoft.Storage/storageAccounts/staticWebsite@2023-01-01' = {
+  name: 'default'
+  parent: storageAccount
+  properties: {
+    indexDocument: 'index.html'
+    error404Document: '404.html'
+  }
+}
 // Cosmos DB Account
 resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2023-03-15' = {
   name: cosmosDbAccountName
