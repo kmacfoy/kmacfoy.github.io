@@ -61,7 +61,7 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --include=dev
         working-directory: countvisitor
 
       - name: Run unit tests
