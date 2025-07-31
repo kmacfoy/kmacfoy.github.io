@@ -69,9 +69,9 @@ jobs:
         working-directory: countvisitor
 
   deploy-function:
-    needs: [deploy-frontend, run-tests]
-    runs-on: ubuntu-latest
-    steps:
+      needs: [deploy-frontend, run-tests]
+      runs-on: ubuntu-latest
+      steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -85,21 +85,16 @@ jobs:
         working-directory: countvisitor
 
       - name: Zip function app contents
+        working-directory: countvisitor
         run: |
-         cd countvisitor
-         zip -r ../functionapp.zip . -x '*.git*'
-         mv functionapp.zip ../functionapp.zip
+          zip -r ../functionapp.zip . -x '*.git*'
 
-      - name: Verify functionapp.zip contents
+      - name: Show zip contents
         run: unzip -l functionapp.zip
-      
-      - name: Show workspace contents
-        run: ls -R
-        
 
       - name: Deploy to Azure Function App
         uses: azure/functions-action@v1
         with:
           app-name: kmrescounterapi
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
-          package: ./functionapp.zip
+          package: functionapp.zip
