@@ -88,10 +88,15 @@ jobs:
         run: |
          cd countvisitor
          zip -r ../functionapp.zip . -x '*.git*'
+         mv functionapp.zip ../functionapp.zip
+
+      - name: Verify functionapp.zip contents
+        run: unzip -l functionapp.zip
       
       - name: Show workspace contents
         run: ls -R
         
+
       - name: Deploy to Azure Function App
         uses: azure/functions-action@v1
         with:
