@@ -85,7 +85,6 @@ jobs:
         working-directory: countvisitor
 
       - name: Zip function app contents
-        working-directory: countvisitor
         run: |
          cd ${{ github.workspace }}
          zip -r functionapp.zip countvisitor -x '*.git*'
