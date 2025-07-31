@@ -1,5 +1,3 @@
-# Ignore top-level node_modules
-/node_modules
+# Ignore all node_modules folders
+node_modules\
 
-# Do NOT ignore node_modules in countvisitor
-!countvisitor/node_modules/
