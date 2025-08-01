@@ -1,4 +1,4 @@
-const countVisitor = require('../countvisitor/index');
+const countVisitor = require('./index');
 
 describe('countVisitor function', () => {
   let context;
@@ -16,7 +16,7 @@ describe('countVisitor function', () => {
       throw new Error('Failed to load cosmos');
     });
 
-    const brokenFunc = require('../countvisitor/index');
+    const brokenFunc = require('./index');
     await brokenFunc(context, {});
     expect(context.res.status).toBe(500);
     expect(context.res.body).toHaveProperty('error');
