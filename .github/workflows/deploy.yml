@@ -31,7 +31,7 @@ jobs:
               az storage blob upload \
                 --auth-mode login \
                 --account-name kmreshtml \
-                --container-name '$web' \
+                --container-name "$web" \
                 --file "$file" \
                 --name "$rel_path" \
                 --content-cache-control "no-cache" \
