@@ -87,7 +87,7 @@ jobs:
       - name: Zip function app contents
         working-directory: countvisitor 
         run: |
-          zip -r functionapp.zip . -x '*.git*'
+          zip -r functionapp.zip countvisitor
      
       - name: Move zip to root
         run: mv functionapp.zip ../
