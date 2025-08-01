@@ -85,7 +85,10 @@ jobs:
         working-directory: countvisitor
 
       - name: Zip function app contents
-        run: cd countvisitor && zip -r ../functionapp.zip . -x '*.git*'
+        run: |
+          cd countvisitor
+          rm -rf node_modules # REMOVE THIS FOLDER FROM ZIP
+          zip -r ../functionapp.zip .
          
          
       - name: Show zip contents
@@ -97,3 +100,4 @@ jobs:
           app-name: kmrescounterapi
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
           package: functionapp.zip
+          enable-oryx-build: true
