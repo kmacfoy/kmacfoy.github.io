@@ -93,7 +93,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
       appSettings: [
         {
           name: 'AzureWebJobsStorage'
-          value: listKeys(storageAccount.id, '2023-01-01').keys[0].value
+          value: storageAccount.listKeys().keys[0].value
         }
         {
           name: 'COSMOS_ENDPOINT'
@@ -101,7 +101,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
         }
         {
           name: 'COSMOS_KEY'
-          value: listKeys(cosmosDbAccount.id, '2023-03-15').primaryMasterKey
+          value: cosmosDbAccount.listKeys().primaryMasterKey
         }
         {
           name: 'FUNCTIONS_WORKER_RUNTIME'
