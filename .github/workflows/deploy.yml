@@ -86,9 +86,8 @@ jobs:
 
       - name: Zip function app contents
         run: |
-          cd countvisitor
           rm -rf node_modules # REMOVE THIS FOLDER FROM ZIP
-          zip -r ../functionapp.zip .
+          zip -r functionapp.zip countvisitor host.json package.json package-lock.json
          
          
       - name: Show zip contents
