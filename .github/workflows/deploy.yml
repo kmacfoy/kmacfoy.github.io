@@ -2,8 +2,7 @@ name: Deploy to Azure Static Website and Function App with Testing
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 permissions:
   contents: read
@@ -12,14 +11,10 @@ jobs:
   deploy-frontend:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Login to Azure
-        uses: azure/login@v1
+      - uses: actions/checkout@v4
+      - uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-
       - name: Upload to Azure Storage
         uses: azure/cli@v1
         with:
@@ -37,7 +32,6 @@ jobs:
                 --content-cache-control "no-cache" \
                 --overwrite
             done
-
       - name: Purge Azure CDN Cache
         uses: azure/cli@v1
         with:
@@ -52,47 +46,31 @@ jobs:
   run-tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
-
-      - name: Install dependencies
+      - name: Install deps (root)
         run: npm ci
-        working-directory: countvisitor
-
       - name: Run unit tests
-        run: npx jest
-        working-directory: countvisitor
+        run: npx jest --testPathPattern countvisitor/__tests__
 
   deploy-function:
-      needs: [deploy-frontend, run-tests]
-      runs-on: ubuntu-latest
-      steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+    needs: [deploy-frontend, run-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
-
-      - name: Install dependencies
+      - name: Install deps (root)
         run: npm ci
-        working-directory: countvisitor
-
       - name: Zip function app contents
         run: |
-          rm -rf node_modules countvisitor/node_modules # REMOVE THIS FOLDER FROM ZIP
+          rm -rf node_modules countvisitor/node_modules
           zip -r functionapp.zip host.json package.json package-lock.json countvisitor/
-         
-         
       - name: Show zip contents
         run: unzip -l functionapp.zip
-
       - name: Deploy to Azure Function App
         uses: azure/functions-action@v1
         with:
