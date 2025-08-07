@@ -10,7 +10,7 @@
   "license": "ISC",
   "description": "",
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "dependencies": {
     "@azure/cosmos": "^3.17.1"

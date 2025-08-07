@@ -68,7 +68,12 @@ jobs:
       - name: Zip function app contents
         run: |
           rm -rf node_modules countvisitor/node_modules
-          zip -r functionapp.zip host.json package.json package-lock.json countvisitor/
+          mkdir build
+          cp host.json package.json package-lock.json build/
+          cp -r countvisitor build/
+          cd build
+          zip -r ../functionapp.zip .
+          cd ..
       - name: Show zip contents
         run: unzip -l functionapp.zip
       - name: Deploy to Azure Function App
