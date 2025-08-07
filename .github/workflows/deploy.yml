@@ -81,12 +81,12 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
         working-directory: countvisitor
 
       - name: Zip function app contents
         run: |
-          rm -rf countvisitor/node_modules # REMOVE THIS FOLDER FROM ZIP
+          rm -rf node_modules countvisitor/node_modules # REMOVE THIS FOLDER FROM ZIP
           zip -r functionapp.zip host.json package.json package-lock.json countvisitor/
          
          
