@@ -15,6 +15,7 @@ jobs:
       - uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: Upload to Azure Storage
         uses: azure/cli@v1
         with:
@@ -32,6 +33,7 @@ jobs:
                 --content-cache-control "no-cache" \
                 --overwrite
             done
+
       - name: Purge Azure CDN Cache
         uses: azure/cli@v1
         with:
@@ -50,36 +52,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '18'
-      - name: Install deps (root)
+      - name: Install dependencies
         run: npm ci
+        working-directory: countvisitor
       - name: Run unit tests
-        run: npx jest --testPathPatterns countvisitor/__tests__
+        run: npx jest --testPathPatterns=countvisitor/__tests__
 
   deploy-function:
     needs: [deploy-frontend, run-tests]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-      - name: Install deps (root)
-        run: npm ci
-      - name: Zip function app contents
-        run: |
-          rm -rf node_modules countvisitor/node_modules
-          mkdir build
-          cp host.json package.json package-lock.json build/
-          cp -r countvisitor build/
-          cd build
-          zip -r ../functionapp.zip .
-          cd ..
-      - name: Show zip contents
-        run: unzip -l functionapp.zip
       - name: Deploy to Azure Function App
         uses: azure/functions-action@v1
         with:
           app-name: kmrescounterapi
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
-          package: functionapp.zip
+          package: countvisitor
           enable-oryx-build: true
