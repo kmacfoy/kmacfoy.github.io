@@ -52,30 +52,39 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Install dependencies
-        run: npm ci        
+      - name: Install deps (root)
+        run: npm ci
       - name: Run unit tests
-        run: npx jest --testPathPatterns=countvisitor/__tests__
-        working-directory: countvisitor
-      - name: Build deploy zip
-        run: |
-          rm -rf countvisitor/node_modules
-          zip -r functionapp.zip \
-          host.json package.json package-lock.json \
-          node_modules \
-          countvisitor
-      - name: Show zip contents
-        run: unzip -l functionapp.zip | sed -n '1, 120p'
+        run: npx jest --testPathPatterns "countvisitor/__tests__"
 
   deploy-function:
     needs: [deploy-frontend, run-tests]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # install prod+dev deps at repo root (where host.json & package.json live)
+      - name: Install deps (root)
+        run: npm ci
+
+      # build one self-contained zip at repo root
+      - name: Build function package
+        run: |
+          rm -f functionapp.zip
+          zip -r functionapp.zip \
+            host.json package.json package-lock.json \
+            node_modules \
+            countvisitor
+
+      - name: Show zip contents
+        run: unzip -l functionapp.zip | sed -n '1,200p'
+
       - name: Deploy to Azure Function App
         uses: azure/functions-action@v1
         with:
           app-name: kmrescounterapi
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
           package: functionapp.zip
-          
