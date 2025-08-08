@@ -57,6 +57,7 @@ jobs:
         working-directory: countvisitor
       - name: Run unit tests
         run: npx jest --testPathPatterns=countvisitor/__tests__
+        working-directory: countvisitor
 
   deploy-function:
     needs: [deploy-frontend, run-tests]
