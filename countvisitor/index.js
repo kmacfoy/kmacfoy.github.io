@@ -8,6 +8,7 @@ module.exports = async function (context, req) {
     CosmosClient = cosmosModule.CosmosClient;
   } catch (importErr) {
     context.log("❌ Failed to load @azure/cosmos:", importErr.message);
+    context.log("Has COSMOS_ENDPOINT:", !!process.env.COSMOS_ENDPOINT, "Has COSMOS_KEY:", !!process.env.COSMOS_KEY);
     context.res = {
       status: 500,
       headers: { "Content-Type": "application/json" },
