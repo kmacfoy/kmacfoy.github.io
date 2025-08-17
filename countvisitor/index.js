@@ -10,6 +10,8 @@ module.exports = async function (context, req) {
 
   log("countvisitor invoked");
 
+  const debug = req?.query?.debug === "1";
+
   // CORS allow-list
   const allowed = new Set([
     "https://resume.kaymacfoy.com",
@@ -62,7 +64,7 @@ module.exports = async function (context, req) {
     const id = "visitorCount";
     let item;
 
-    // Read existing item (id, partitionKey) → partitionKey is the id itself
+    // Read existing item (id, partitionKey)
     try {
       const { resource } = await container.item(id, id).read();
       item = resource;
@@ -79,19 +81,27 @@ module.exports = async function (context, req) {
     // Upsert with matching partition key
     await container.items.upsert(item, { partitionKey: id });
 
-    context.res = {
-      status: 200,
-      headers: corsHeaders,
-      body: { count: item.count },
-    };
+    const body = debug
+      ? { count: item.count, _debug: { hasEndpoint, hasKey } }
+      : { count: item.count };
+
+    context.res = { status: 200, headers: corsHeaders, body };
   } catch (err) {
-    const code = err?.code || err?.statusCode;
+    const code = err?.code || err?.statusCode || err?.name || "UNKNOWN";
     const msg = err?.message || String(err);
-    logError("❌ Handler error:", code ? `[${code}]` : "", msg);
+    const extra = err?.body?.message || err?.body?.toString?.();
+
+    logError("❌ Handler error:", code ? `[${code}]` : "", msg, extra);
+
     context.res = {
       status: 500,
       headers: corsHeaders,
-      body: { error: msg, code: code || "UNKNOWN" },
+      body: {
+        error: msg,
+        code,
+        extra,
+        stack: err?.stack,
+      },
     };
   }
 };
