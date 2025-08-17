@@ -56,7 +56,7 @@ jobs:
       run: npm ci
     - name: Run unit tests
       # either option works; this form is widely compatible
-      run: npx jest --testPathPattern "countvisitor/__tests__"
+      run: npx jest --testPathPatterns "countvisitor/__tests__"
 
   deploy-function:
    needs: [deploy-frontend, run-tests]
