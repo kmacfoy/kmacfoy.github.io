@@ -1,0 +1,105 @@
+name: Deploy to Azure Static Website and Function App with Testing
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Upload to Azure Storage
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az account set --subscription "1f9e870a-8f55-4a59-9977-55f5a592c78b"
+            for file in $(find . -type f \( -name "*.html" -o -name "*.css" \)); do
+              rel_path="${file#./}"
+              echo "Uploading $rel_path"
+              az storage blob upload \
+                --auth-mode login \
+                --account-name kmreshtml \
+                --container-name "\$web" \
+                --file "$file" \
+                --name "$rel_path" \
+                --content-cache-control "no-cache" \
+                --overwrite
+            done
+
+      - name: Purge Azure CDN Cache
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az account set --subscription "1f9e870a-8f55-4a59-9977-55f5a592c78b"
+            az cdn endpoint purge \
+              --resource-group kmres01 \
+              --profile-name resumeCDN \
+              --name kmendpoint \
+              --content-paths '/*'
+
+  run-tests:
+   runs-on: ubuntu-latest
+   steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - name: Install deps (root)
+      run: npm ci
+    - name: Run unit tests
+      # either option works; this form is widely compatible
+      run: npx jest --testPathPatterns "countvisitor/__tests__"
+
+  deploy-function:
+   needs: [deploy-frontend, run-tests]
+   runs-on: ubuntu-latest
+   steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Sanity check paths
+      run: |
+        echo "PWD: $(pwd)"
+        ls -la
+        test -f host.json || (echo "❌ host.json missing at repo root" && exit 1)
+        test -f package.json || (echo "❌ package.json missing at repo root" && exit 1)
+        test -f package-lock.json || (echo "❌ package-lock.json missing at repo root" && exit 1)
+        test -d countvisitor || (echo "❌ countvisitor folder missing (case-sensitive?)" && exit 1)
+        test -f countvisitor/index.js || (echo "❌ countvisitor/index.js missing" && exit 1)
+        test -f countvisitor/function.json || (echo "❌ countvisitor/function.json missing" && exit 1)
+
+    - name: Install deps (root)
+      run: npm ci
+
+    - name: Build function package
+      run: |
+        rm -f functionapp.zip
+        zip -r functionapp.zip \
+          host.json \
+          package.json \
+          package-lock.json \
+          node_modules \
+          countvisitor
+
+    - name: Show zip contents
+      run: |
+        unzip -l functionapp.zip | sed -n '1,200p'
+        echo "---- verify function files ----"
+        unzip -l functionapp.zip | grep -E "countvisitor/(index\.js|function\.json)" || (echo "❌ function files not in zip" && exit 1)
+
+    - name: Deploy to Azure Function App
+      uses: azure/functions-action@v1
+      with:
+        app-name: kmrescounterapi
+        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+        package: functionapp.zip
