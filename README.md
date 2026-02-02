@@ -11,3 +11,5 @@ Added a link to my GitHub repository
 Created CI/CD by linking GitHub with Azure
 
 6/23/25 - removed checkmarks from certification section and fixed cdn purging
+
+2/1/26 - Deployed a static resume site using Azure Static Web Apps with CI/CD via GitHub Actions. Implemented a serverless visitor counter using Azure Functions (Consumption) and Cosmos DB. Optimized costs by removing an orphaned App Service Plan, reducing monthly spend from ~$75 to ~$2.
