@@ -1,0 +1,41 @@
+name: deploy counter function
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "countvisitor/**"
+      - "host.json"
+      - ".github/workflows/deploy-function.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: install deps
+        working-directory: countvisitor
+        run: npm ci
+
+      - name: package deployment zip
+        run: |
+          zip -r function.zip host.json countvisitor -x "countvisitor/__tests__/**"
+
+      - name: deploy to azure functions
+        uses: Azure/functions-action@v1
+        with:
+          app-name: kmrescounterapi
+          package: function.zip
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+
+      - name: upload zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: function-zip
+          path: function.zip
