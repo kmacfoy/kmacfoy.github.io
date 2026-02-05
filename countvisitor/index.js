@@ -67,7 +67,12 @@ module.exports = async function (context, req) {
     const totalId = "visitorCount";
 
     // Use UTC date; if you want Eastern, we can switch to a TZ-based formatter.
-    const day = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+    const day = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/New_York",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+}).format(new Date());
     const dailyId = `daily_${day}`;
 
     // helper: read-or-create
