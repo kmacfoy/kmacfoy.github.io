@@ -6,7 +6,7 @@ module.exports = async function (context, req) {
   const logError =
     (typeof context?.log === "object" && typeof context.log.error === "function")
       ? context.log.error.bind(context.log)
-      : (...args) => baseLog(...args); // fall back to normal log in tests
+      : (...args) => baseLog(...args);
 
   log("countvisitor invoked");
 
@@ -18,7 +18,10 @@ module.exports = async function (context, req) {
     "https://kmreshtml.z13.web.core.windows.net",
   ]);
   const reqOrigin = req?.headers?.origin;
-  const corsOrigin = allowed.has(reqOrigin) ? reqOrigin : "https://resume.kaymacfoy.com";
+  const corsOrigin = allowed.has(reqOrigin)
+    ? reqOrigin
+    : "https://resume.kaymacfoy.com";
+
   const corsHeaders = {
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": corsOrigin,
@@ -52,7 +55,7 @@ module.exports = async function (context, req) {
     }
 
     const client = new CosmosClient({
-      endpoint: process.env.COSMOS_ENDPOINT, // e.g. https://kmrescounter.documents.azure.com:443/
+      endpoint: process.env.COSMOS_ENDPOINT,
       key: process.env.COSMOS_KEY,
     });
 
@@ -60,30 +63,41 @@ module.exports = async function (context, req) {
     const containerId = "counter";
     const container = client.database(databaseId).container(containerId);
 
-    // Partition key is `/id` so use id === 'visitorCount'
-    const id = "visitorCount";
-    let item;
+    // --- IDs (partition key is `/id`, so partitionKey === id) ---
+    const totalId = "visitorCount";
 
-    // Read existing item (id, partitionKey)
-    try {
-      const { resource } = await container.item(id, id).read();
-      item = resource;
-    } catch (e) {
-      if (e?.code === 404) {
-        item = { id, count: 0 };
-      } else {
+    // Use UTC date; if you want Eastern, we can switch to a TZ-based formatter.
+    const day = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+    const dailyId = `daily_${day}`;
+
+    // helper: read-or-create
+    async function readOrInit(id) {
+      try {
+        const { resource } = await container.item(id, id).read();
+        return resource;
+      } catch (e) {
+        if (e?.code === 404) return { id, count: 0 };
         throw e;
       }
     }
 
-    item.count = (item.count ?? 0) + 1;
+    // increment total
+    const total = await readOrInit(totalId);
+    total.count = (total.count ?? 0) + 1;
+    await container.items.upsert(total, { partitionKey: totalId });
 
-    // Upsert with matching partition key
-    await container.items.upsert(item, { partitionKey: id });
+    // increment daily
+    const daily = await readOrInit(dailyId);
+    daily.count = (daily.count ?? 0) + 1;
+    await container.items.upsert(daily, { partitionKey: dailyId });
 
     const body = debug
-      ? { count: item.count, _debug: { hasEndpoint, hasKey } }
-      : { count: item.count };
+      ? {
+          count: total.count,
+          today: daily.count,
+          _debug: { hasEndpoint, hasKey, day, totalId, dailyId },
+        }
+      : { count: total.count, today: daily.count };
 
     context.res = { status: 200, headers: corsHeaders, body };
   } catch (err) {
