@@ -72,14 +72,16 @@ module.exports = async function (context, req) {
 
     // helper: read-or-create
     async function readOrInit(id) {
-      try {
-        const { resource } = await container.item(id, id).read();
-        return resource;
-      } catch (e) {
-        if (e?.code === 404) return { id, count: 0 };
-        throw e;
-      }
-    }
+  try {
+    const { resource } = await container.item(id, id).read();
+    if (!resource) return { id, count: 0 };
+    return resource;
+  } catch (e) {
+    const status = e?.code ?? e?.statusCode;
+    if (status === 404) return { id, count: 0 };
+    throw e;
+  }
+}
 
     // increment total
     const total = await readOrInit(totalId);
