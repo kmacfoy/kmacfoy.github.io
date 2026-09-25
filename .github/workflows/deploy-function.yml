@@ -23,6 +23,10 @@ jobs:
         working-directory: countvisitor
         run: npm ci
 
+      - name: run tests
+        working-directory: countvisitor
+        run: npm test
+
       - name: package deployment zip
         run: |
           zip -r function.zip host.json countvisitor -x "countvisitor/__tests__/**"
