@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "eastus2"
+        },
+        "functionAppName": {
+            "value": "kmrescounterapi-iac-test"
+        },
+        "hostingPlanName": {
+            "value": "kmres-iac-test-plan"
+        },
+        "storageAccountName": {
+            "value": "kmresihttpstest"
+        },
+        "cosmosAccountName": {
+            "value": "kmrescounter-iac-test"
+        }
+    }
+}
